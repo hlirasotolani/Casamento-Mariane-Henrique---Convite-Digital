@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Convite Interativo</title>
+
+<style>
+body {
+  margin: 0;
+  background: #f8f5f0;
+  font-family: "Georgia", "Times New Roman", serif;
+}
+
+.tela {
+  max-width: 452px;
+  margin: 0 auto;
+  position: relative;
+}
+
+#envelopeBox {
+  width: 100%;
+  position: relative;
+  cursor: pointer;
+  transition: opacity .7s ease, transform .7s ease;
+}
+
+#envelope {
+  width: 100%;
+  display: block;
+}
+
+/*
+  NOME DOS CONVIDADOS SOBRE A TAG DO NOVO ENVELOPE
+
+  A imagem base tem 4500 x 9728 px. A tag branca fica atrás do selo,
+  inclinada para baixo à direita. Este bloco coloca o texto exatamente
+  sobre essa tag.
+
+  Ajustes finos, caso precise:
+  - left: aumenta para mover o texto para a direita; diminui para a esquerda.
+  - top: aumenta para descer o texto; diminui para subir.
+  - width: aumenta/diminui a área disponível para o nome.
+  - rotate: acompanha a inclinação da tag. Use 24deg a 28deg se necessário.
+
+  Posição ajustada para a tag branca do novo envelope: o texto fica no centro
+  da faixa branca que sai atrás do selo, e não mais acima da tag.
+*/
+#tagNomeConvidados {
+  position: absolute;
+  left: 64.9%;
+  top: 67.75%;
+  width: 20.8%;
+  min-height: 2.3%;
+  transform: translate(-50%, -50%) rotate(25.5deg);
+  transform-origin: center center;
+  z-index: 6;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  padding: 0 0.25rem;
+
+  color: #6f604f;
+  font-family: "Georgia", "Times New Roman", serif;
+  font-size: clamp(7px, 2.05vw, 10.5px);
+  font-style: italic;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+  letter-spacing: 0.01em;
+
+  pointer-events: none;
+  text-shadow: 0 0.5px 0 rgba(255,255,255,0.45);
+
+  /* Evita o nome aparecer antes do carregamento completo do envelope. */
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .25s ease;
+}
+
+#envelopeBox.envelope-pronto #tagNomeConvidados {
+  opacity: 1;
+  visibility: visible;
+}
+
+#tagNomeConvidados.nome-longo {
+  font-size: clamp(6px, 1.65vw, 8.8px);
+  letter-spacing: 0;
+}
+
+#tagNomeConvidados.nome-muito-longo {
+  font-size: clamp(5px, 1.35vw, 7px);
+  letter-spacing: -0.01em;
+}
+
+#conviteBox {
+  display: none;
+  position: relative;
+  width: 100%;
+}
+
+#convite {
+  width: 100%;
+  display: block;
+}
+
+.link-area {
+  position: absolute;
+  left: 19%;
+  width: 63%;
+  height: 1.95%;
+  z-index: 10;
+}
+
+.cerimonia { top: 84.6%; }
+.festa { top: 87.1%; }
+.site { top: 89.6%; }
+.presenca { top: 92.05%; }
+.presentes { top: 94.55%; }
+</style>
+</head>
+
+<body>
+
+<div class="tela">
+
+  <div id="envelopeBox" aria-label="Toque para abrir o convite">
+    <img id="envelope" src="novo-envelope.png" alt="Toque para abrir o convite">
+
+    <!-- O texto abaixo fica sobre a tag branca que já existe na imagem. -->
+    <div id="tagNomeConvidados">Nome dos convidados</div>
+  </div>
+
+  <div id="conviteBox">
+    <img id="convite" src="convite.png" alt="Convite de casamento">
+
+    <a class="link-area cerimonia" target="_blank"
+       href="https://www.google.com/maps/place/Instituto+S%C3%A3o+Vicente/@-20.386303,-54.6098134,17z/data=!3m1!4b1!4m6!3m5!1s0x9486dd4c7928c96f:0x3f9972dab8e20efd!8m2!3d-20.386303!4d-54.6072385!16s%2Fg%2F1ptyx09t4"></a>
+
+    <a class="link-area festa" target="_blank"
+       href="https://www.google.com/maps/place/Est%C3%A2ncia+das+Orqu%C3%ADdeas/@-20.4250437,-54.5244706,17z/data=!3m1!4b1!4m6!3m5!1s0x9486e980aae6a2b5:0xdc1ae4b1e2ee692c!8m2!3d-20.4250437!4d-54.5244706!16s%2Fg%2F11gybqx3g3"></a>
+
+    <a class="link-area site" target="_blank"
+       href="http://noivos.casar.com/mariane-e-henrique-2026-10-31"></a>
+
+    <a class="link-area presenca" target="_blank"
+       href="https://noivos.casar.com/mariane-e-henrique-2026-10-31#/rsvp"></a>
+
+    <a class="link-area presentes" target="_blank"
+       href="https://noivos.casar.com/mariane-e-henrique-2026-10-31#/presentes"></a>
+  </div>
+
+</div>
+
+<audio id="musica" src="musica.mp3" loop></audio>
+
+<script>
+const envelopeBox = document.getElementById("envelopeBox");
+const envelope = document.getElementById("envelope");
+const conviteBox = document.getElementById("conviteBox");
+const musica = document.getElementById("musica");
+const tagNomeConvidados = document.getElementById("tagNomeConvidados");
+
+// Individualização do convite por link:
+// Exemplo principal:
+// index.html?convidados=Jo%C3%A3o%20e%20Maria
+//
+// Também aceita:
+// index.html?nome=Fam%C3%ADlia%20Silva
+// index.html?para=Aos%20meus%20amados%20pais
+const parametros = new URLSearchParams(window.location.search);
+const convidados = parametros.get("convidados") || parametros.get("nome") || parametros.get("para");
+
+if (convidados && convidados.trim()) {
+  const texto = convidados.trim();
+  tagNomeConvidados.textContent = texto;
+
+  // Reduz automaticamente a fonte para nomes maiores.
+  tagNomeConvidados.classList.toggle("nome-longo", texto.length > 24 && texto.length <= 38);
+  tagNomeConvidados.classList.toggle("nome-muito-longo", texto.length > 38);
+}
+
+// Só libera a exibição do nome depois que a imagem do envelope estiver carregada.
+function liberarNomeDepoisDoEnvelope() {
+  envelopeBox.classList.add("envelope-pronto");
+}
+
+if (envelope.complete && envelope.naturalWidth > 0) {
+  // Pequeno atraso para evitar piscada durante renderização/cache.
+  requestAnimationFrame(() => setTimeout(liberarNomeDepoisDoEnvelope, 80));
+} else {
+  envelope.addEventListener("load", () => {
+    requestAnimationFrame(() => setTimeout(liberarNomeDepoisDoEnvelope, 80));
+  }, { once: true });
+}
+
+envelopeBox.addEventListener("click", () => {
+  musica.play().catch(() => {});
+
+  envelopeBox.style.opacity = "0";
+  envelopeBox.style.transform = "scale(0.96)";
+
+  setTimeout(() => {
+    envelopeBox.style.display = "none";
+    conviteBox.style.display = "block";
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, 650);
+});
+</script>
+
+</body>
+</html>
